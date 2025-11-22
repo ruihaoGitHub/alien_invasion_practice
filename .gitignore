@@ -9,4 +9,4 @@ __pycache__/
 online_resources_site/site/
 
 *.sqlite3
-
+.vscode/
