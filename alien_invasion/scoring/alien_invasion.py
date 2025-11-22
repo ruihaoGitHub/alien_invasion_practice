@@ -149,22 +149,23 @@ class AlienInvasion:
         """Respond to bullet-alien collisions."""
         # Remove any bullets and aliens that have collided.
         collisions = pygame.sprite.groupcollide(
-                self.bullets, self.aliens, True, True)
+                self.bullets, self.aliens, True, False)
 
         if collisions:
             self.alien_sound.play()
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
+                for alien in aliens:
+                    alien.dying = True 
             self.sb.prep_score()
             self.sb.check_high_score()
 
-        if not self.aliens:
-            # Destroy existing bullets and create new fleet.
+        alive_aliens = [alien for alien in self.aliens if not alien.dying]
+        if not alive_aliens:
             self.bullets.empty()
+            self.aliens.empty() # 把剩下的尸体也清掉，直接进下一关
             self._create_fleet()
             self.settings.increase_speed()
-
-            # Increase level.
             self.stats.level += 1
             self.sb.prep_level()
 
@@ -194,18 +195,23 @@ class AlienInvasion:
         self._check_fleet_edges()
         self.aliens.update()
 
-        # Look for alien-ship collisions.
-        if pygame.sprite.spritecollideany(self.ship, self.aliens):
-            self._ship_hit()
+        #清理掉出屏幕下方的挂掉的外星人
+        for alien in self.aliens.copy():
+            if alien.dying and alien.rect.top >= self.settings.screen_height:
+                self.aliens.remove(alien)
 
+        alive_aliens_group = pygame.sprite.Group([a for a in self.aliens if not a.dying])
+        
+        if pygame.sprite.spritecollideany(self.ship, alive_aliens_group):
+            self._ship_hit()
         # Look for aliens hitting the bottom of the screen.
         self._check_aliens_bottom()
 
     def _check_aliens_bottom(self):
         """Check if any aliens have reached the bottom of the screen."""
         for alien in self.aliens.sprites():
-            if alien.rect.bottom >= self.settings.screen_height:
-                # Treat this the same as if the ship got hit.
+            # 只有活着的到了底部才算输
+            if not alien.dying and alien.rect.bottom >= self.settings.screen_height:
                 self._ship_hit()
                 break
 
@@ -245,6 +251,8 @@ class AlienInvasion:
         """Drop the entire fleet and change the fleet's direction."""
         for alien in self.aliens.sprites():
             alien.rect.y += self.settings.fleet_drop_speed
+            alien.y = float(alien.rect.y) 
+            
         self.settings.fleet_direction *= -1
 
     def _update_screen(self):
