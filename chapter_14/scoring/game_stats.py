@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 class GameStats:
     """Track statistics for Alien Invasion."""
 
