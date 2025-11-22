@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 import sys
 from time import sleep
 
@@ -25,6 +27,8 @@ class AlienInvasion:
             (self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Alien Invasion")
 
+        self.bullet_sound = pygame.mixer.Sound('sounds/laserLarge_000.ogg')
+        self.alien_sound = pygame.mixer.Sound('sounds/explosionCrunch_000.ogg')
         # Create an instance to store game statistics,
         #   and create a scoreboard.
         self.stats = GameStats(self)
@@ -59,7 +63,8 @@ class AlienInvasion:
         """Respond to keypresses and mouse events."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
+                self._close_game()
+                
             elif event.type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
@@ -67,6 +72,16 @@ class AlienInvasion:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 self._check_play_button(mouse_pos)
+
+    def _close_game(self):
+        """Save high score and exit."""
+        saved_high_score = self.stats.get_saved_high_score()
+        
+        path = Path('high_score.json')
+        contents = json.dumps(self.stats.high_score)
+        path.write_text(contents)
+        
+        sys.exit()
 
     def _check_play_button(self, mouse_pos):
         """Start a new game when the player clicks Play."""
@@ -116,6 +131,7 @@ class AlienInvasion:
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
+            self.bullet_sound.play()
 
     def _update_bullets(self):
         """Update position of bullets and get rid of old bullets."""
@@ -136,6 +152,7 @@ class AlienInvasion:
                 self.bullets, self.aliens, True, True)
 
         if collisions:
+            self.alien_sound.play()
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
             self.sb.prep_score()
