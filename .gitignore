@@ -3,10 +3,13 @@
 __pycache__/
 *.pyc
 
+
+.vscode/
+.vs/
+
 *_env/
 .venv*/
 
 online_resources_site/site/
 
 *.sqlite3
-.vscode/
