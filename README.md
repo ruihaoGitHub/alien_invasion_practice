@@ -8,18 +8,20 @@ This is an extended version of the "Alien Invasion" game from the book *Python C
 3. **Visual Effects**: Aliens spin and fall down when hit instead of disappearing instantly.
 
 ## 🛠️ Installation & Run
-1. Make sure you have Python installed.[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fgithub.com%2FruihaoGitHub%2Falien_invasion_practice)]
-2. Install `pygame`:
+1. Clone the repository:
    ```bash
-   pip install pygame
-   ```[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fgithub.com%2FruihaoGitHub%2Falien_invasion_practice)]
+   git clone https://github.com/ruihaoGitHub/alien_invasion_practice.git
+   cd alien_invasion_practice
+   
+   
+2. Install dependencies:
+   pip install -r requirements.txt
 3. Run the game:
    ```bash
    cd alien_invasion
    python alien_invasion.py
-   ```[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fgithub.com%2FruihaoGitHub%2Falien_invasion_practice)]
 
 ## 🎮 Controls
 - **Arrow Keys**: Move the ship.
-- **Spacebar**: Shoot bullets.[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fgithub.com%2FruihaoGitHub%2Falien_invasion_practice)]
+- **Spacebar**: Shoot bullets.
 - **Q**: Quit the game.
