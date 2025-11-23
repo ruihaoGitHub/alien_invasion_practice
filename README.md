@@ -12,9 +12,10 @@ This is an extended version of the "Alien Invasion" game from the book *Python C
    git clone https://github.com/ruihaoGitHub/alien_invasion_practice.git
    cd alien_invasion_practice
    
-   
 2. Install dependencies:
+    ```bash
    pip install -r requirements.txt
+
 3. Run the game:
    ```bash
    cd alien_invasion
