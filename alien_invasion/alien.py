@@ -26,7 +26,7 @@ class Alien(Sprite):
         self.y = float(self.rect.y) 
 
         self.dying = False 
-        self.drop_speed = 10 # 尸体掉落的速度（比活着的时候下沉快）
+        self.drop_speed = 10 # 被击中外星人掉落的速度（比活着的时候下沉快）
         self.angle = 0 
 
     def check_edges(self):

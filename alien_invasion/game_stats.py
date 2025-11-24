@@ -19,6 +19,7 @@ class GameStats:
         self.score = 0
         self.level = 1
 
+    #加载最高分，没有就为0
     def get_saved_high_score(self):
         """Get high score from file, if it exists."""
         path = Path('high_score.json')

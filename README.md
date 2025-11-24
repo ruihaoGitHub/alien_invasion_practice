@@ -7,6 +7,7 @@ This is an extended version of the "Alien Invasion" game from the book *Python C
 3. **Visual Effects**: Aliens spin and fall down when hit instead of disappearing instantly.
 
 ## 🛠️ Installation & Run
+(python=3.9.23)
 1. Clone the repository:
    ```bash
    git clone https://github.com/ruihaoGitHub/alien_invasion_practice.git
@@ -23,5 +24,6 @@ This is an extended version of the "Alien Invasion" game from the book *Python C
 
 ## 🎮 Controls
 - **Arrow Keys**: Move the ship.
-- **Spacebar**: Shoot bullets.
+- **Spacebar**: Shoot bullets.(then you can hear "bui" and "bomb")
 - **Q**: Quit the game.
+  (PS:The falling alien will block your bullets!)

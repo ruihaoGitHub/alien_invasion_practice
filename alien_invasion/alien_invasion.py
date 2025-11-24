@@ -27,6 +27,7 @@ class AlienInvasion:
             (self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Alien Invasion")
 
+        #加载音效
         self.bullet_sound = pygame.mixer.Sound('sounds/laserLarge_000.ogg')
         self.alien_sound = pygame.mixer.Sound('sounds/explosionCrunch_000.ogg')
         # Create an instance to store game statistics,
@@ -75,8 +76,7 @@ class AlienInvasion:
 
     def _close_game(self):
         """Save high score and exit."""
-        saved_high_score = self.stats.get_saved_high_score()
-        
+        #用python自带的模块存储最高分
         path = Path('high_score.json')
         contents = json.dumps(self.stats.high_score)
         path.write_text(contents)
@@ -115,7 +115,8 @@ class AlienInvasion:
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
-            sys.exit()
+            self._close_game()
+            #sys.exit()
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
 
@@ -131,7 +132,7 @@ class AlienInvasion:
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
-            self.bullet_sound.play()
+            self.bullet_sound.play()#音效
 
     def _update_bullets(self):
         """Update position of bullets and get rid of old bullets."""
@@ -152,11 +153,11 @@ class AlienInvasion:
                 self.bullets, self.aliens, True, False)
 
         if collisions:
-            self.alien_sound.play()
+            self.alien_sound.play()#sound effect
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
                 for alien in aliens:
-                    alien.dying = True 
+                    alien.dying = True #把被射中的alien设为dying，不立马清除
             self.sb.prep_score()
             self.sb.check_high_score()
 
