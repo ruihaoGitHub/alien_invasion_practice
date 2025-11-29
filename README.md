@@ -25,5 +25,6 @@ This is an extended version of the "Alien Invasion" game from the book *Python C
 ## 🎮 Controls
 - **Arrow Keys**: Move the ship.
 - **Spacebar**: Shoot bullets.(then you can hear "bui" and "bomb")
+- **Z**: Ultimate Skill, Only One at a time.
 - **Q**: Quit the game.
 (PS:The falling alien will block your bullets!)

@@ -24,6 +24,7 @@ class Scoreboard:
         self.prep_high_score()
         self.prep_level()
         self.prep_ships()
+        self.prep_super_bullet_hint()
 
     def prep_score(self):
         """Turn the score into a rendered image."""
@@ -69,6 +70,17 @@ class Scoreboard:
             ship.rect.y = 10
             self.ships.add(ship)
 
+    def prep_super_bullet_hint(self):
+        """渲染大招提示信息"""
+        hint_str = "Super Bullet: Z"
+        # 使用红色字体提示
+        self.hint_image = self.font.render(hint_str, True, (255, 0, 0), self.settings.bg_color)
+        
+        self.hint_rect = self.hint_image.get_rect()
+        self.hint_rect.left = 10
+        # 放在左上角飞船显示的下方
+        self.hint_rect.top = 60
+
     def check_high_score(self):
         """Check to see if there's a new high score."""
         if self.stats.score > self.stats.high_score:
@@ -80,4 +92,9 @@ class Scoreboard:
         self.screen.blit(self.score_image, self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
         self.screen.blit(self.level_image, self.level_rect)
+        
+        # 仅在游戏未开始（或结束）时显示提示
+        if not self.ai_game.game_active:
+            self.screen.blit(self.hint_image, self.hint_rect)
+            
         self.ships.draw(self.screen)

@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import sys
+import math
 from time import sleep
 
 import pygame
@@ -10,8 +11,9 @@ from game_stats import GameStats
 from scoreboard import Scoreboard
 from button import Button
 from ship import Ship
-from bullet import Bullet
+from bullet import Bullet, SuperBullet
 from alien import Alien
+from particle import Particle
 
 
 class AlienInvasion:
@@ -37,7 +39,9 @@ class AlienInvasion:
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.super_bullets = pygame.sprite.Group()#引入超级子弹编组
         self.aliens = pygame.sprite.Group()
+        self.particles = pygame.sprite.Group() # 粒子编组
 
         self._create_fleet()
 
@@ -56,6 +60,7 @@ class AlienInvasion:
                 self.ship.update()
                 self._update_bullets()
                 self._update_aliens()
+                self.particles.update() # 更新所有火花的位置和生命
 
             self._update_screen()
             self.clock.tick(60)
@@ -117,6 +122,11 @@ class AlienInvasion:
         elif event.key == pygame.K_q:
             self._close_game()
             #sys.exit()
+        
+        # Z 键发射大招
+        elif event.key == pygame.K_z:
+            self._fire_super_bullet()
+
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
 
@@ -134,15 +144,27 @@ class AlienInvasion:
             self.bullets.add(new_bullet)
             self.bullet_sound.play()#音效
 
+    def _fire_super_bullet(self):
+        """创建一颗超级子弹，并将其加入到编组 super_bullets 中"""
+        # 屏幕上只能同时存在1颗超级子弹
+        if len(self.super_bullets) < 1: 
+            new_bullet = SuperBullet(self)
+            self.super_bullets.add(new_bullet)
+
     def _update_bullets(self):
         """Update position of bullets and get rid of old bullets."""
         # Update bullet positions.
         self.bullets.update()
+        self.super_bullets.update()
 
         # Get rid of bullets that have disappeared.
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
+
+        for bullet in self.super_bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.super_bullets.remove(bullet)
 
         self._check_bullet_alien_collisions()
 
@@ -161,9 +183,46 @@ class AlienInvasion:
             self.sb.prep_score()
             self.sb.check_high_score()
 
+        # --- 超级子弹逻辑 (范围伤害) ---
+        # 1. 检测超级子弹是否撞到了外星人
+        super_collisions = pygame.sprite.groupcollide(
+                self.super_bullets, self.aliens, True, False)
+
+        if super_collisions:
+            # super_collisions 是一个字典，key是子弹，value是被击中的外星人列表
+            for bullet, hit_aliens in super_collisions.items():
+                self.alien_sound.play()
+                # 以子弹消失的位置为爆炸中心
+                blast_center = bullet.rect.center
+                
+                # 生成爆炸特效！
+                # 循环生成 50 个小火花，加入到 particles 编组中
+                for _ in range(50):
+                    new_particle = Particle(self, blast_center)
+                    self.particles.add(new_particle)
+
+                # 遍历所有活着的外星人，检查距离
+                for alien in self.aliens.sprites():
+                    if alien.dying: continue # 已经死的不管
+
+                    # 计算外星人中心到爆炸中心的距离 (勾股定理)
+                    distance = math.hypot(
+                        alien.rect.centerx - blast_center[0],
+                        alien.rect.centery - blast_center[1]
+                    )
+                    
+                    # 如果距离小于爆炸半径，销毁外星人
+                    if distance < self.settings.blast_radius:
+                        alien.dying = True
+                        self.stats.score += self.settings.alien_points
+            
+            self.sb.prep_score()
+            self.sb.check_high_score()
+
         alive_aliens = [alien for alien in self.aliens if not alien.dying]
         if not alive_aliens:
             self.bullets.empty()
+            self.super_bullets.empty() # 清空超级子弹
             self.aliens.empty() # 把剩下的尸体也清掉，直接进下一关
             self._create_fleet()
             self.settings.increase_speed()
@@ -193,7 +252,7 @@ class AlienInvasion:
 
     def _update_aliens(self):
         """Check if the fleet is at an edge, then update positions."""
-        self._check_fleet_edges()
+        # 不再检查整个舰队的边缘
         self.aliens.update()
 
         #清理掉出屏幕下方的挂掉的外星人
@@ -261,8 +320,17 @@ class AlienInvasion:
         self.screen.fill(self.settings.bg_color)
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        
+        # 绘制所有超级子弹
+        for bullet in self.super_bullets.sprites():
+            bullet.draw_bullet()
+
         self.ship.blitme()
         self.aliens.draw(self.screen)
+        
+        # 绘制火花特效
+        for particle in self.particles.sprites():
+            particle.draw_particle()
 
         # Draw the score information.
         self.sb.show_score()

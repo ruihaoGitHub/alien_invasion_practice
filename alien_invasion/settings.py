@@ -17,6 +17,13 @@ class Settings:
         self.bullet_color = (60, 60, 60)
         self.bullets_allowed = 100
 
+        # --- 超级子弹（大招）设置 ---
+        self.super_bullet_width = 15  # 比普通子弹宽
+        self.super_bullet_height = 30
+        self.super_bullet_color = (255, 0, 0) # 红色，表示威力大
+        self.super_bullet_speed = 2.0 # 稍微慢一点，更有压迫感
+        self.blast_radius = 250 # 爆炸半径（像素），在这个范围内的外星人都会被消灭
+
         # Alien settings
         self.fleet_drop_speed = 5
 
